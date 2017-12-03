@@ -23,13 +23,26 @@ const Grid = class {
     ]
     this.pointerDirection = 0
     this.directionChangeAfter = 1
-    this.directionSteps = -1
+    this.steps = -1
     this.changeDirectionAt = 1
     this.stepsPerDirection = 1
   }
   get(row, col) {
     let rowData = this.data[row]
     return rowData[col]
+  }
+  getPosition(value) {
+    for (let rowIndex = this.pointerRow; rowIndex < this.data.length; rowIndex++) {
+      const row = this.data[rowIndex]
+      for (let colIndex = this.pointerCol; colIndex < row.length; colIndex++) {
+        if (row[colIndex] === value) {
+          return {
+            col: colIndex,
+            row: rowIndex
+          }
+        }
+      }
+    }
   }
   addNext(value) {
     let row = this.pointerRow
@@ -41,8 +54,8 @@ const Grid = class {
     rowData[col] = value
 
     // Does the direction need to change?
-    this.directionSteps++
-    if (this.directionSteps === this.changeDirectionAt) {
+    this.steps++
+    if (this.steps === this.changeDirectionAt) {
       this.pointerDirection = (this.pointerDirection + 1) % this.directions.length
 
       this.changeDirectionAt = this.changeDirectionAt + this.stepsPerDirection
@@ -63,17 +76,21 @@ let grid = new Grid
 
 let value = 1
 
-let max = 110
-while (value < max) {
+let target = 347991
+while (value <= target) {
   grid.addNext(value)
   value++
 }
 
-console.log(grid.get(0, 0) === 1)
-console.log(grid.get(0, 1) === 2)
-console.log(grid.get(-1, 1) === 3)
-console.log(grid.get(-1, 0) === 4)
-console.log(grid.get(-1, -1) === 5)
-console.log(grid.get(0, -1) === 6)
+// console.log(grid.get(0, 0) === 1)
+// console.log(grid.get(0, 1) === 2)
+// console.log(grid.get(-1, 1) === 3)
+// console.log(grid.get(-1, 0) === 4)
+// console.log(grid.get(-1, -1) === 5)
+// console.log(grid.get(0, -1) === 6)
 
-console.log(grid.get(1, 2) === 10)
+// console.log(grid.get(1, 2) === 10)
+
+const at = grid.getPosition(target)
+const distance = Math.abs(at.row) + Math.abs(at.col)
+console.log(distance)
