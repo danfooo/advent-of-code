@@ -3,6 +3,7 @@ const Grid = class {
     this.data = []
     this.pointerRow = 0
     this.pointerCol = 0
+    this.pointerDirection = 0
     this.directions = [
       {
         row: 0,
@@ -21,8 +22,6 @@ const Grid = class {
         col: 0
       }
     ]
-    this.pointerDirection = 0
-    this.directionChangeAfter = 1
     this.steps = -1
     this.changeDirectionAt = 1
     this.stepsPerDirection = 1
@@ -73,7 +72,6 @@ const Grid = class {
 }
 
 let grid = new Grid
-
 let value = 1
 
 let target = 347991
@@ -94,3 +92,7 @@ while (value <= target) {
 const at = grid.getPosition(target)
 const distance = Math.abs(at.row) + Math.abs(at.col)
 console.log(distance)
+
+// 2
+
+
