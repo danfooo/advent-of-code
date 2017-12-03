@@ -27,14 +27,6 @@ const Grid = class {
     this.changeDirectionAt = 1
     this.stepsPerDirection = 1
   }
-  add(row, col, value) {
-    let rowData = this.data[row] || (this.data[row] = [])
-    if (rowData[col]) {
-      console.log(`rowData[col] is already set: ${rowData[col]}`);
-    }
-    rowData[col] = value
-    this.valueCount++
-  }
   get(row, col) {
     let rowData = this.data[row]
     return rowData[col]
@@ -43,6 +35,9 @@ const Grid = class {
     let row = this.pointerRow
     let col = this.pointerCol
     let rowData = this.data[row] || (this.data[row] = [])
+    if (rowData[col]) {
+      console.log(`rowData[col] is already set: ${rowData[col]}`);
+    }
     rowData[col] = value
 
     // Does the direction need to change?
