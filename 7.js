@@ -1,3 +1,17 @@
+const test = `pbga (66)
+xhth (57)
+ebii (61)
+havc (66)
+ktlj (57)
+fwft (72) -> ktlj, cntj, xhth
+qoyq (66)
+padx (45) -> pbga, havc, qoyq
+tknk (41) -> ugml, padx, fwft
+jptl (61)
+ugml (68) -> gyxo, ebii, jptl
+gyxo (61)
+cntj (57)`
+
 const input = `czlmv (78)
 fiwbd (57)
 twxnswy (98)
@@ -1072,3 +1086,62 @@ list = list.map(row => {
 const getParent = (id) => list.find(compareProgram => compareProgram.subIds.includes(id))
 const root = list.find(program => !getParent(program.id))
 console.log(root.id)
+
+// 2
+let list2 = input.split('\n')
+list2 = list2.map(row => {
+  const parts = row.split(' -> ')
+  const idWeightSplit = parts[0].split(' (')
+  return {
+    id: idWeightSplit[0],
+    subIds: parts[1] ? parts[1].split(', ') : [],
+    weight: parseInt(idWeightSplit[1].split(')')[0], 10)
+  }
+})
+
+// Add the total weight to each program. That's its own weight and the total weight of its children
+const getProgram = (id) => list2.find(p => p.id === id)
+
+const getTotalWeight = (program) => {
+  if (program.totalWeight) {
+    return program.totalWeight
+  }
+  const children = program.subIds.map(getProgram)
+  const weights = children.map(getTotalWeight)
+  return program.weight + weights.reduce((acc, sum) => acc + sum, 0)
+}
+
+list2 = list2.map(program => ({
+  ...program,
+  totalWeight: getTotalWeight(program)
+}))
+
+// Which programs have unbalanced sub programs?
+const unbalanced = list2.filter(program => {
+  if (program.subIds.length === 0) {
+    return false
+  }
+  const children = program.subIds.map(getProgram)
+  const weights = children.map(getTotalWeight)
+  return !weights.every((weight, i, all) => weight === all[0])
+})
+
+// But which one is it that really has the unbalance in it?
+const offWeight = []
+unbalanced.map(program => {
+  const children = program.subIds.map(getProgram)
+  const weights = children.map(getTotalWeight)
+  weights.forEach((weight, i, all) => {
+    // weight can still be the right one even if it doesn't match the next one like in
+    // [2, 1, 2]
+    // If it doesn't match the next AND previous one, it's wrong.
+    const prev = all[(i - 1) % all.length]
+    const next = all[(i + 1) % all.length]
+    if (weight !== prev && weight !== next) {
+      offWeight.push(getProgram(program.subIds[i]))
+      console.log(`weight of ${program.subIds[i]} should be ${next} but is ${weight}`)
+    }
+  })
+})
+
+console.log(offWeight)
