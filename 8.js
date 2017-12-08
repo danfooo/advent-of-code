@@ -1030,12 +1030,9 @@ instructions.forEach(instruction => {
   const shouldCompute = eval(`base ${condition.compareParam} ${condition.compareValue}`)
   if (shouldCompute) {
     const value = values[id] || 0
-    values[id] = change.operation === 'inc' ? value + change.by : value - change.by
-    const oldHighestEver = highestEver;
-    const newHighestEver = Math.max(...Object.keys(values).map(key => values[key]))
-    if (newHighestEver > oldHighestEver) {
-      highestEver = newHighestEver
-    }
+    const newValue = change.operation === 'inc' ? value + change.by : value - change.by
+    values[id] = newValue
+    highestEver = Math.max(highestEver, newValue)
   }
 })
 
