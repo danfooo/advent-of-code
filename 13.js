@@ -49,40 +49,78 @@ const test = `0: 3
 4: 4
 6: 4`
 
-const layers = {}
+// Debug
+const droppedAt = {}
+
+const parsedLayers = {}
 input.split('\n').forEach(row => {
   const split = row.split(': ')
-  layers[parseInt(split[0], 10)] = {
+  parsedLayers[split[0]] = {
     depth: parseInt(split[1], 10),
-    position: 0,
-    direction: 1
   }
 })
-const layerKeys = Object.keys(layers)
-const end = Math.max(...layerKeys)
+const layerKeys = Object.keys(parsedLayers)
 
-const moveScanners = () => {
-  layerKeys.forEach(layerKey => {
-    const layer = layers[layerKey]
-    const { depth, position, direction } = layer
-    layer.position += direction
-    if (layer.position === 0) {
-      layer.direction = 1
-    }
-    else if (layer.position === depth - 1) {
-      layer.direction = -1
+function getScore(delay = 0) {
+  let score = null
+  const layers = {}
+  layerKeys.forEach(key => {
+    const layer = parsedLayers[key];
+    layers[key] = {
+      ...layer,
+      position: 0,
+      direction: 1
     }
   })
-}
 
-let score = 0
-
-for (let step = 0; step < end; step++) {
-  const scanner = layers[step]
-  if (scanner && scanner.position === 0) {
-    score += step * scanner.depth
+  const moveScanners = (by = 1) => {
+    layerKeys.forEach(layerKey => {
+      const layer = layers[layerKey]
+      const { depth } = layer
+      for (let i = 0; i < by; i++) {
+        const { position, direction } = layer
+        layer.position += direction
+        if (layer.position === 0) {
+          layer.direction = 1
+        }
+        else if (layer.position === depth - 1) {
+          layer.direction = -1
+        }
+      }
+    })
   }
-  moveScanners()
+
+  moveScanners(delay)
+
+  const end = Math.max(...layerKeys)
+  for (let step = 0; step <= end; step++) {
+    const scanner = layers[step]
+    if (scanner && scanner.position === 0) {
+      score += step * scanner.depth
+      // Debug
+      droppedAt[step] = (droppedAt[step] || 0) + 1
+      // Only for part 2
+      return score
+    }
+    moveScanners()
+  }
+  return score
 }
 
-console.log(score)
+// console.log(`Result 1: ${getScore()}`)
+
+// 2
+// How long do we initially have to wait so we can get a pass without getting caught at all?
+
+let delay = 0
+while (getScore(delay) !== null) {
+  delay++
+  if (delay % 100 === 0) {
+    console.log(delay)
+    console.log(droppedAt)
+  }
+}
+
+console.log(`Result 2: ${delay}`)
+
+// console.log(getScore(5))
